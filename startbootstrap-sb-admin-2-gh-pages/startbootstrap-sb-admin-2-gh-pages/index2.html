@@ -28,6 +28,30 @@
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
+        
+        .sidebar .profile {
+            text-align: center;
+        }
+
+        .sidebar .profile img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sidebar .profile input[type="file"] {
+            display: none;
+        }
+
+        .sidebar .profile .change-picture {
+            color: #4e73df;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
 
         .main-content {
             margin-left: 270px;
@@ -92,11 +116,16 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
+        <div class="profile">
+            <img src="https://via.placeholder.com/100" alt="Profile Image" id="profile-img">
+            <input type="file" id="upload-img" onchange="previewImage()">
+            <label for="upload-img" class="change-picture" id="change-picture-label">Change Picture</label>
+        </div>
         <h4>Welcome, Student!</h4>
         <hr>
         <a href="#" class="d-block mb-3"><i class="fas fa-book"></i> Courses</a>
         <a href="#" class="d-block mb-3"><i class="fas fa-calendar-alt"></i> Schedule</a>
-        <a href="#" class="d-block mb-3"><i class="fas fa-chart-bar"></i> Reports</a>
+        <a href="#" class="d-block mb-3"><i class="fas fa-chart-bar"></i> Feedback</a>
     </div>
 
     <!-- Main Content -->
@@ -114,25 +143,30 @@
                 </div>
             </div>
         </div>
+<!-- Interactive Cards -->
+<div class="interactive-cards">
+    <!-- Card for "Your Courses" -->
+    <a href="courses2.html" class="card-box text-decoration-none">
+        <i class="fas fa-book"></i>
+        <h5 class="text-dark">Your Courses</h5>
+        <p class="text-muted">Access your current courses</p>
+    </a>
 
-        <!-- Interactive Cards -->
-        <div class="interactive-cards">
-            <div class="card-box">
-                <i class="fas fa-book"></i>
-                <h5>Your Courses</h5>
-                <p>Access your current courses</p>
-            </div>
-            <div class="card-box">
-                <i class="fas fa-calendar-check"></i>
-                <h5>Upcoming Tests</h5>
-                <p>Check your scheduled exams</p>
-            </div>
-            <div class="card-box">
-                <i class="fas fa-envelope"></i>
-                <h5>Notifications</h5>
-                <p>View recent updates</p>
-            </div>
-        </div>
+    <!-- Card for "Upcoming Tests" -->
+    <a href="tests.html" class="card-box text-decoration-none">
+        <i class="fas fa-calendar-check"></i>
+        <h5 class="text-dark">Upcoming Tests</h5>
+        <p class="text-muted">Check your scheduled exams</p>
+    </a>
+
+    <!-- Card for "Notifications" -->
+    <a href="notifications.html" class="card-box text-decoration-none">
+        <i class="fas fa-envelope"></i>
+        <h5 class="text-dark">Notifications</h5>
+        <p class="text-muted">View recent updates</p>
+    </a>
+</div>
+
 
         <!-- Schedule and Chart Section -->
         <div class="schedule-section">
@@ -155,4 +189,33 @@
     </div>
 </body>
 
+<script>
+// Image Preview and Change
+        function previewImage() {
+            const file = document.getElementById("upload-img").files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function () {
+                const imageBase64 = reader.result;
+                document.getElementById("profile-img").src = imageBase64;
+                localStorage.setItem("profileImage", imageBase64); // Save the image to localStorage
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // On page load, set the profile image if available
+        document.addEventListener("DOMContentLoaded", function () {
+            const storedImage = localStorage.getItem("profileImage");
+            if (storedImage) {
+                document.getElementById("profile-img").src = storedImage;
+            }
+        });
+</script>
+
+ <!-- Bootstrap JS -->
+ <script src="vendor/jquery/jquery.min.js"></script>
+ <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </html>
