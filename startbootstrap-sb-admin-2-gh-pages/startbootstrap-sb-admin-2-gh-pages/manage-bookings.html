@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fc;
+            margin: 0;
+        }
+
+        .navbar {
+            background-color: #6EC1E4;
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 250px;
+            background: #ffffff;
+            color: #333;
+            height: calc(100vh - 60px);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar .profile {
+            text-align: center;
+        }
+
+        .sidebar .profile img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sidebar .profile input[type="file"] {
+            display: none;
+        }
+
+        .sidebar .profile .change-picture {
+            color: #4e73df;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            margin: 10px 0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link:hover {
+            background: #f8f9fc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .main-content {
+            margin-left: 270px;
+            padding: 20px;
+            margin-top: 60px;
+        }
+
+        .booking-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn-accept {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            transition: background 0.3s;
+        }
+
+        .btn-accept:hover {
+            background-color: #218838;
+        }
+
+        .btn-decline {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            transition: background 0.3s;
+        }
+
+        .btn-decline:hover {
+            background-color: #c82333;
+        }
+
+        #calendar {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="#">
+            <h4>Manage Bookings</h4>
+        </a>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="profile">
+            <img src="https://via.placeholder.com/100" alt="Profile Image" id="profile-img">
+            <input type="file" id="upload-img" onchange="previewImage()">
+            <label for="upload-img" class="change-picture" id="change-picture-label">Change Picture</label>
+            <h5 class="mt-3" id="tutor-name">[Tutor Name]</h5>
+        </div>
+        <a href="index.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <hr>
+        <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
+        <hr>
+        <a href="manage-bookings.html" class="nav-link"><i class="fas fa-calendar-check"></i> Manage Bookings</a>
+        <hr>
+        <a href="confirmations.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Schedule</a>
+        <hr>
+        <a href="feedback.html" class="nav-link"><i class="fas fa-comments"></i> Feedback</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2 class="mb-4">Booking Requests</h2>
+        <div id="booking-container">
+            <!-- Booking cards will be added dynamically -->
+        </div>
+
+        <!-- Calendar -->
+        <div id="calendar"></div>
+    </div>
+
+    <!-- Modal for accepting bookings -->
+    <div class="modal fade" id="acceptBookingModal" tabindex="-1" aria-labelledby="acceptBookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="acceptBookingModalLabel">Accept Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="booking-details"></p>
+                    <button class="btn btn-success" id="accept-button">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <script>
+        const bookings = [
+            { student: "Jane Smith", subject: "English", time: "3:00 PM, Nov 26", id: 1 },
+            { student: "Mike Brown", subject: "Science", time: "11:00 AM, Nov 27", id: 2 },
+            { student: "Alice Johnson", subject: "History", time: "9:30 AM, Nov 28", id: 3 }
+        ];
+
+        const container = document.getElementById("booking-container");
+
+        bookings.forEach(booking => {
+            const card = document.createElement("div");
+            card.classList.add("booking-card");
+            card.innerHTML = `
+                <h5>Student: ${booking.student}</h5>
+                <p>Subject: ${booking.subject}</p>
+                <p>Time: ${booking.time}</p>
+                <button class="btn btn-accept me-2" onclick="acceptBooking(${booking.id})">Accept</button>
+                <button class="btn btn-decline" onclick="declineBooking(${booking.id})">Decline</button>
+            `;
+            container.appendChild(card);
+        });
+
+        let acceptedBookings = [];
+
+        // Accept a booking and add it to the calendar
+        function acceptBooking(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (booking && !acceptedBookings.includes(bookingId)) {
+                acceptedBookings.push(bookingId);
+                localStorage.setItem("acceptedBookings", JSON.stringify(acceptedBookings));
+                calendar.addEvent({
+                    title: `${booking.student} - ${booking.subject}`,
+                    start: new Date(`Nov ${booking.time.split(",")[0]} ${new Date().getFullYear()} 2024 ${booking.time.split(" ")[0]}`),
+                    description: `${booking.student} has booked a session for ${booking.subject}`,
+                    allDay: false,
+                });
+            }
+        }
+
+        // Decline a booking
+        function declineBooking(bookingId) {
+            alert(`Booking with ${bookings.find(b => b.id === bookingId).student} has been declined.`);
+        }
+
+        // Initialize calendar
+        let calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: [],
+            dateClick: function(info) {
+                const selectedDate = info.dateStr;
+                const modal = new bootstrap.Modal(document.getElementById('acceptBookingModal'));
+                document.getElementById("booking-details").textContent = `Select a time slot for ${selectedDate}`;
+                modal.show();
+            }
+        });
+
+        calendar.render();
+
+        // Load user data and profile image
+        function loadUserData() {
+            const storedUser = localStorage.getItem("loggedInUser");
+            const storedImage = localStorage.getItem("profileImage");
+
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                document.getElementById("tutor-name").textContent = `${user.firstName} ${user.lastName}`;
+            } else {
+                const user = { firstName: "John", lastName: "Doe" };
+                localStorage.setItem("loggedInUser", JSON.stringify(user));
+                document.getElementById("tutor-name").textContent = `${user.firstName} ${user.lastName}`;
+            }
+
+            if (storedImage) {
+                document.getElementById("profile-img").src = storedImage;
+            }
+        }
+
+        // Update profile image
+        function previewImage() {
+            const file = document.getElementById("upload-img").files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function () {
+                const imageBase64 = reader.result;
+                document.getElementById("profile-img").src = imageBase64;
+                localStorage.setItem("profileImage", imageBase64);
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Load user data when page is loaded
+        document.addEventListener("DOMContentLoaded", loadUserData);
+    </script>
+</body>
+
+</html>

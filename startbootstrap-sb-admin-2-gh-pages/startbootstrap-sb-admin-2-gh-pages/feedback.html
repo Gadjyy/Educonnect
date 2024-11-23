@@ -122,6 +122,9 @@
         .feedback-card p {
             margin-bottom: 0;
         }
+        .stars {
+            color: #FFD700;
+        }
     </style>
 </head>
 
@@ -146,8 +149,11 @@
         </div>
         <hr class="bg-light">
         <a href="index.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="students.html" class="nav-link"><i class="fas fa-user"></i> Students</a>
+        <hr>
+        <a href="manage-bookings.html" class="nav-link"><i class="fas fa-calendar-check"></i> Manage Bookings</a>
+        <hr>
         <a href="confirmations.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Schedule</a>
+        <hr>
         <a href="feedback.html" class="nav-link"><i class="fas fa-comments"></i> Feedback</a>
     </div>
 
@@ -156,18 +162,55 @@
         <div class="feedback-section">
             <h3>Student Feedback</h3>
 
-            <!-- Feedback Cards (These would be populated dynamically) -->
+            <!-- Feedback Cards -->
             <div class="feedback-card">
-                <h5>Student: John Doe</h5>
-                <p><strong>Feedback:</strong> Great tutor, very knowledgeable and helpful during the lessons!</p>
+                <h5>Student: Alex Johnson</h5>
+                <p><strong>Feedback:</strong> The tutor explained everything clearly and made the lessons enjoyable. I feel much more confident in the subject now!</p>
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+            
+
+            <div class="feedback-card">
+                <h5>Student: Michael Brown</h5>
+                <p><strong>Feedback:</strong> The tutor was very patient and provided clear explanations for difficult topics. I improved significantly in a short time!</p>
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
             </div>
 
             <div class="feedback-card">
                 <h5>Student: Jane Smith</h5>
                 <p><strong>Feedback:</strong> I learned a lot, and the lessons were easy to follow. Highly recommend!</p>
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
             </div>
-
-            <!-- Add more feedback cards here -->
+            <div class="feedback-card">
+                <h5>Student: Emily White</h5>
+                <p><strong>Feedback:</strong> The lessons were engaging and tailored to my needs. I felt supported throughout the entire learning process.</p>
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+                
         </div>
     </div>
 
@@ -212,30 +255,59 @@
             loadFeedback();
         });
 
-        // Function to load feedback from localStorage
-        function loadFeedback() {
-            const feedbackData = JSON.parse(localStorage.getItem("feedbackData")) || [];
+        // // Function to load feedback from localStorage
+        // function loadFeedback() {
+        //     const feedbackData = JSON.parse(localStorage.getItem("feedbackData")) || [];
 
-            const feedbackSection = document.querySelector(".feedback-section");
+        //     const feedbackSection = document.querySelector(".feedback-section");
 
-            feedbackData.forEach(feedback => {
-                const feedbackCard = `
-                    <div class="feedback-card">
-                        <h5>Student: ${feedback.student}</h5>
-                        <p><strong>Feedback:</strong> ${feedback.message}</p>
-                    </div>`;
-                feedbackSection.innerHTML += feedbackCard;
-            });
-        }
+        //     feedbackData.forEach(feedback => {
+        //         const feedbackCard = `
+        //             <div class="feedback-card">
+        //                 <h5>Student: ${feedback.student}</h5>
+        //                 <p><strong>Feedback:</strong> ${feedback.message}</p>
+        //             </div>`;
+        //         feedbackSection.innerHTML += feedbackCard;
+        //     });
+        // }
 
-        // Function to save feedback (this is just for testing purposes)
-        function saveFeedback() {
-            const feedbackData = [
-                { student: "John Doe", message: "Great tutor, very knowledgeable!" },
-                { student: "Jane Smith", message: "The lessons were easy to follow!" }
-            ];
-            localStorage.setItem("feedbackData", JSON.stringify(feedbackData));
-        }
+        // // Function to save feedback (this is just for testing purposes)
+        // function saveFeedback() {
+        //     const feedbackData = [
+        //         { student: "John Doe", message: "Great tutor, very knowledgeable!" },
+        //         { student: "Jane Smith", message: "The lessons were easy to follow!" }
+        //     ];
+        //     localStorage.setItem("feedbackData", JSON.stringify(feedbackData));
+        // }
+
+        // // Simulate dynamic feedback with ratings
+        // const feedbackData = [
+        //     { student: "John Doe", feedback: "Great tutor, very knowledgeable and helpful during the lessons!", rating: 4 },
+        //     { student: "Jane Smith", feedback: "I learned a lot, and the lessons were easy to follow. Highly recommend!", rating: 5 }
+        // ];
+
+        // // Function to render feedback
+        // function renderFeedback() {
+        //     const feedbackSection = document.querySelector(".feedback-section");
+
+        //     feedbackData.forEach(feedback => {
+        //         const stars = Array(5)
+        //             .fill('<i class="far fa-star"></i>')
+        //             .map((star, index) => index < feedback.rating ? '<i class="fas fa-star"></i>' : star)
+        //             .join("");
+
+        //         const feedbackCard = `
+        //             <div class="feedback-card">
+        //                 <h5>Student: ${feedback.student}</h5>
+        //                 <p><strong>Feedback:</strong> ${feedback.feedback}</p>
+        //                 <div class="stars">${stars}</div>
+        //             </div>`;
+        //         feedbackSection.innerHTML += feedbackCard;
+        //     });
+        // }
+
+        // // Load feedback on page load
+        // document.addEventListener("DOMContentLoaded", renderFeedback);
     </script>
 </body>
 

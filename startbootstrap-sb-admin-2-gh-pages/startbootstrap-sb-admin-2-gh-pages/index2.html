@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -15,20 +17,47 @@
         }
 
         .navbar {
-            background-color: #4e73df;
+            background-color: #6EC1E4;
             color: #fff;
             padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar .navbar-brand img {
+            height: 40px;
+            width: 100px;
+        }
+
+        .navbar .logout-btn {
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .navbar .logout-btn:hover {
+            background-color: #2e59d9;
         }
 
         .sidebar {
-            width: 250px;
-            height: 100vh;
             position: fixed;
-            background: #fff;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            top: 60px;
+            left: 0;
+            width: 250px;
+            background: #ffffff;
+            color: #333;
+            height: calc(100vh - 60px);
             padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid #ddd;
         }
-        
+
         .sidebar .profile {
             text-align: center;
         }
@@ -53,9 +82,24 @@
             margin-top: 10px;
         }
 
+        .sidebar .nav-link {
+            color: #333;
+            margin: 10px 0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link:hover {
+            background: #f8f9fc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
         .main-content {
             margin-left: 270px;
             padding: 20px;
+            margin-top: 60px;
         }
 
         .greeting-box {
@@ -104,28 +148,57 @@
             object-fit: cover;
             border-radius: 10px;
         }
+
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Add styles for the chart */
+        #rate-chart-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
     </style>
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <a class="navbar-brand" href="#">Student Dashboard</a>
-        <a href="login.html" class="btn btn-danger ms-auto">Logout</a>
+    <!-- Navbar for Student Dashboard -->
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="#">
+            <h4>Student Dashboard</h4>
+        </a>
+        <div class="navbar-nav ms-auto">
+            <!-- Logout Button -->
+            <button class="btn-logout nav-item" onclick="logout()">Logout</button>
+        </div>
     </nav>
 
-    <!-- Sidebar -->
+    <!-- Sidebar for Student Dashboard -->
     <div class="sidebar">
         <div class="profile">
             <img src="https://via.placeholder.com/100" alt="Profile Image" id="profile-img">
             <input type="file" id="upload-img" onchange="previewImage()">
             <label for="upload-img" class="change-picture" id="change-picture-label">Change Picture</label>
+            <h5 class="mt-3" id="student-name">[Student Name]</h5>
         </div>
-        <h4>Welcome, Student!</h4>
+        <hr class="bg-light">
+        <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i>  Tutors Profile</a>
         <hr>
-        <a href="#" class="d-block mb-3"><i class="fas fa-book"></i> Courses</a>
-        <a href="#" class="d-block mb-3"><i class="fas fa-calendar-alt"></i> Schedule</a>
-        <a href="#" class="d-block mb-3"><i class="fas fa-chart-bar"></i> Feedback</a>
+        <a href="index2.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <hr>
+        <a href="courses.html" class="nav-link"><i class="fas fa-book"></i> Courses</a>
+        <hr>
+        <a href="schedule.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Schedule</a>
+        <hr>
+        <a href="feedback.html" class="nav-link"><i class="fas fa-comments"></i> Feedback</a>
     </div>
 
     <!-- Main Content -->
@@ -134,88 +207,92 @@
         <div class="greeting-box">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h2>Hello, [Student Name]!</h2>
-                    <p>Welcome back! Let’s dive into your studies and upcoming activities.</p>
-                    <p><strong>Member since:</strong> 2024 | <strong>Profile views:</strong> 234</p>
+                    <h2 id="greeting">Hello, Student [Student Full Name]!</h2>
+                    <p>We’re happy to have you here, progressing in your studies. Let’s achieve your goals together!</p>
+                    <p><strong>Member since:</strong> <span id="member-since">Loading...</span> | <strong>Profile
+                            views:</strong> 150</p>
                 </div>
                 <div class="col-md-4 text-center">
                     <img src="greet.png" alt="Illustration" style="max-width: 100%; height: auto;">
                 </div>
             </div>
         </div>
-<!-- Interactive Cards -->
-<div class="interactive-cards">
-    <!-- Card for "Your Courses" -->
-    <a href="courses2.html" class="card-box text-decoration-none">
-        <i class="fas fa-book"></i>
-        <h5 class="text-dark">Your Courses</h5>
-        <p class="text-muted">Access your current courses</p>
-    </a>
 
-    <!-- Card for "Upcoming Tests" -->
-    <a href="tests.html" class="card-box text-decoration-none">
-        <i class="fas fa-calendar-check"></i>
-        <h5 class="text-dark">Upcoming Tests</h5>
-        <p class="text-muted">Check your scheduled exams</p>
-    </a>
-
-    <!-- Card for "Notifications" -->
-    <a href="notifications.html" class="card-box text-decoration-none">
-        <i class="fas fa-envelope"></i>
-        <h5 class="text-dark">Notifications</h5>
-        <p class="text-muted">View recent updates</p>
-    </a>
-</div>
-
-
-        <!-- Schedule and Chart Section -->
-        <div class="schedule-section">
-            <div class="card-box">
-                <div class="d-flex align-items-center">
-                    <img src="sched.png" alt="Schedule Image" class="schedule-image me-3">
-                    <div>
-                        <h5>Next Class</h5>
-                        <p><strong>Course:</strong> Math 101</p>
-                        <p><strong>Topic:</strong> Algebra</p>
-                        <p><strong>Time:</strong> Nov 22, 2024 | 10:00 AM</p>
-                    </div>
+        <!-- Interactive Cards -->
+        <div class="interactive-cards">
+            <a href="search-tutors.html" class="card-link">
+                <div class="card-box">
+                    <i class="fas fa-book"></i>
+                    <h5>Search Tutors</h5>
+                    <p>Browse and filter by subjects, rates, and reviews</p>
                 </div>
-            </div>
-            <div class="card-box">
-                <h5>Progress Chart</h5>
-                <p>Track your performance over time</p>
-            </div>
+            </a>
+            <a href="book-sessions.html" class="card-link">
+                <div class="card-box">
+                    <i class="fas fa-calendar-check"></i>
+                    <h5>Book Sessions</h5>
+                    <p>Schedule and confirm tutoring sessions</p>
+                </div>
+            </a>
+            <a href="ratings.html" class="card-link">
+                <div class="card-box">
+                    <i class="fas fa-comments"></i>
+                    <h5>Leave Reviews</h5>
+                    <p>Provide feedback for your tutors</p>
+                </div>
+            </a>
         </div>
+
+        <!-- Display Student's Schedule -->
+        <div id="student-schedule-section"></div>
     </div>
-</body>
 
-<script>
-// Image Preview and Change
+    <script>
+        // Student Data
+        const studentData = {
+            name: "John Doe",
+            memberSince: "January 2022",
+            schedule: [
+                { date: "2024-11-24", course: "Math 101", time: "10:00 AM" },
+                { date: "2024-11-25", course: "Science 202", time: "12:00 PM" }
+            ],
+            proficiency: [70, 80, 90]  // Example data for subject proficiency chart (Math, Science, English)
+        };
+
+        // Setting student data dynamically
+        document.getElementById("student-name").textContent = studentData.name;
+        document.getElementById("greeting").textContent = `Hello, ${studentData.name}!`;
+        document.getElementById("member-since").textContent = studentData.memberSince;
+
+        // Display upcoming schedule
+        const scheduleSection = document.getElementById("student-schedule-section");
+        studentData.schedule.forEach(item => {
+            scheduleSection.innerHTML += `
+                <div class="d-flex justify-content-between mb-3">
+                    <span>${item.date}</span>
+                    <span>${item.course} at ${item.time}</span>
+                </div>
+            `;
+        });
+
+        // Logout Function
+        function logout() {
+            localStorage.removeItem('studentData');
+            window.location.href = 'login.html';
+        }
+
+        // Image Preview for Profile Picture
         function previewImage() {
-            const file = document.getElementById("upload-img").files[0];
-            const reader = new FileReader();
-
-            reader.onloadend = function () {
-                const imageBase64 = reader.result;
-                document.getElementById("profile-img").src = imageBase64;
-                localStorage.setItem("profileImage", imageBase64); // Save the image to localStorage
-            };
-
+            const file = document.getElementById('upload-img').files[0];
             if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('profile-img').src = e.target.result;
+                }
                 reader.readAsDataURL(file);
             }
         }
+    </script>
+</body>
 
-        // On page load, set the profile image if available
-        document.addEventListener("DOMContentLoaded", function () {
-            const storedImage = localStorage.getItem("profileImage");
-            if (storedImage) {
-                document.getElementById("profile-img").src = storedImage;
-            }
-        });
-</script>
-
- <!-- Bootstrap JS -->
- <script src="vendor/jquery/jquery.min.js"></script>
- <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </html>

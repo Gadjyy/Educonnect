@@ -93,24 +93,29 @@
         <h2>Manage Courses</h2>
 
         <!-- Add Course Form -->
-        <div class="course-card">
-            <h4>Add New Course</h4>
-            <input type="text" id="course-name" placeholder="Course Name">
-            <input type="text" id="course-code" placeholder="Course Code">
-            <label for="course-day">Select Day:</label>
-            <select id="course-day">
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
-            </select>
-            <label for="course-time">Select Time:</label>
-            <input type="time" id="course-time">
-            <button class="btn btn-primary" onclick="addCourse()">Add Course</button>
-        </div>
+            <div class="course-card">
+                <h4>Add New Course</h4>
+                <input type="text" id="course-name" placeholder="Course Name">
+                <input type="text" id="course-code" placeholder="Course Code">
+                <label for="course-day">Select Day:</label>
+                <select id="course-day">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+                <label for="course-time">Select Time:</label>
+                <input type="time" id="course-time">
+                
+                <!-- File Upload Input for Course Materials -->
+                <label for="course-material">Upload Course Material (Optional):</label>
+                <input type="file" id="course-material" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                
+                <button class="btn btn-primary" onclick="addCourse()">Add Course</button>
+            </div>
 
         <!-- Courses List -->
         <div id="courses-list">
