@@ -43,9 +43,90 @@
             background-color: #2e59d9;
         }
 
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 250px;
+            background: #ffffff;
+            color: #333;
+            height: calc(100vh - 60px);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid #ddd;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar .profile {
+            text-align: center;
+        }
+
+        .sidebar .profile img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sidebar .profile input[type="file"] {
+            display: none;
+        }
+
+        .sidebar .profile .change-picture {
+            color: #4e73df;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            margin: 10px 0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link:hover {
+            background: #f8f9fc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
         .main-content {
+            margin-left: 260px;
             padding: 20px;
             margin-top: 60px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.collapsed {
+            margin-left: 10px;
+        }
+
+        .toggle-sidebar-btn {
+            position: fixed;
+            top: 65px;
+            left: 10px;
+            background-color: #6EC1E4;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1050;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .course-card {
@@ -54,13 +135,6 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-        }
-
-        .course-card input,
-        .course-card select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
         }
 
         #courses-list ul {
@@ -88,41 +162,61 @@
         </div>
     </nav>
 
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="profile">
+            <img src="https://via.placeholder.com/100" alt="Profile Image" id="profile-img">
+            <input type="file" id="upload-img" onchange="previewImage()">
+            <label for="upload-img" class="change-picture" id="change-picture-label">Change Picture</label>
+            <h5 class="mt-3" id="tutor-name">[Tutor Name]</h5>
+        </div>
+        <hr>
+        <a href="index.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <!-- <hr>
+        <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a> -->
+        <hr>
+        <a href="manage-bookings.html" class="nav-link"><i class="fas fa-calendar-check"></i> Manage Bookings</a>
+        <hr>
+        <a href="confirmations.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Schedule</a>
+        <hr>
+        <a href="feedback.html" class="nav-link"><i class="fas fa-comments"></i> Feedback</a>
+    </div>
+
+
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <h2>Manage Courses</h2>
 
         <!-- Add Course Form -->
-            <div class="course-card">
-                <h4>Add New Course</h4>
-                <input type="text" id="course-name" placeholder="Course Name">
-                <input type="text" id="course-code" placeholder="Course Code">
-                <label for="course-day">Select Day:</label>
-                <select id="course-day">
-                    <option value="Monday">Monday</option>
-                    <option value="Tuesday">Tuesday</option>
-                    <option value="Wednesday">Wednesday</option>
-                    <option value="Thursday">Thursday</option>
-                    <option value="Friday">Friday</option>
-                    <option value="Saturday">Saturday</option>
-                    <option value="Sunday">Sunday</option>
-                </select>
-                <label for="course-time">Select Time:</label>
-                <input type="time" id="course-time">
-                
-                <!-- File Upload Input for Course Materials -->
-                <label for="course-material">Upload Course Material (Optional):</label>
-                <input type="file" id="course-material" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                
-                <button class="btn btn-primary" onclick="addCourse()">Add Course</button>
-            </div>
+        <div class="course-card">
+            <h4>Add New Course</h4>
+            <input type="text" id="course-name" placeholder="Course Name">
+            <input type="text" id="course-code" placeholder="Course Code">
+            <div class="form-group">
+                <label for="student-limit">Student Limit</label>
+                <input type="number" id="student-limit" class="form-control" placeholder="Enter student limit" min="1" required>
+            </div>            
+            <label for="course-day">Select Day:</label>
+            <select id="course-day">
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+            <label for="course-time">Select Time:</label>
+            <input type="time" id="course-time">
+            <label for="course-material">Upload Course Material (Optional):</label>
+            <input type="file" id="course-material" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            <button class="btn btn-primary" onclick="addCourse()">Add Course</button>
+        </div>
 
         <!-- Courses List -->
         <div id="courses-list">
             <h4>Courses List</h4>
-            <ul id="course-items">
-                <!-- Courses will be dynamically listed here -->
-            </ul>
+            <ul id="course-items"></ul>
         </div>
     </div>
 
@@ -132,13 +226,29 @@
             const courseCode = document.getElementById('course-code').value;
             const courseDay = document.getElementById('course-day').value;
             const courseTime = document.getElementById('course-time').value;
+            const studentLimit = parseInt(document.getElementById('student-limit').value);
     
-            if (courseName && courseCode && courseDay && courseTime) {
+            if (courseName && courseCode && courseDay && courseTime && studentLimit > 0) {
                 const courses = JSON.parse(localStorage.getItem('courses')) || [];
                 const confirmedSchedules = JSON.parse(localStorage.getItem('confirmedSchedules')) || [];
     
-                const newCourse = { name: courseName, code: courseCode, day: courseDay, time: courseTime };
-                
+                // Check if course already exists and whether student limit is reached
+                const existingCourse = courses.find(course => course.code === courseCode);
+                if (existingCourse && existingCourse.enrolledStudents >= existingCourse.studentLimit) {
+                    alert("The course has reached its student limit.");
+                    return;
+                }
+    
+                // Create new course object
+                const newCourse = { 
+                    name: courseName, 
+                    code: courseCode, 
+                    day: courseDay, 
+                    time: courseTime, 
+                    studentLimit: studentLimit,
+                    enrolledStudents: 0  // Initialize with zero enrolled students
+                };
+    
                 // Add course to both lists
                 courses.push(newCourse);
                 confirmedSchedules.push(newCourse);
@@ -152,9 +262,12 @@
                 document.getElementById('course-code').value = '';
                 document.getElementById('course-day').value = 'Monday';
                 document.getElementById('course-time').value = '';
+                document.getElementById('student-limit').value = '';
     
                 // Refresh the course list
                 displayCourses();
+            } else {
+                alert("Please fill all fields and set a valid student limit.");
             }
         }
     
@@ -186,18 +299,57 @@
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
                     ${course.name} (Code: ${course.code}) - Every ${course.day} at ${course.time}
+                    - Limit: ${course.studentLimit} students (Enrolled: ${course.enrolledStudents})
                     <button class="btn btn-danger btn-sm ms-2" onclick="deleteCourse(${index})">Delete</button>
                 `;
                 courseItems.appendChild(listItem);
             });
         }
     
+        // // Sidebar toggle
+        // document.getElementById('toggleSidebar').addEventListener('click', function () {
+        //     const sidebar = document.getElementById('sidebar');
+        //     const mainContent = document.getElementById('mainContent');
+        //     sidebar.classList.toggle('collapsed');
+        //     mainContent.classList.toggle('collapsed');
+        // });
+    
+        // Profile image preview and upload
+        function previewImage() {
+            const file = document.getElementById('upload-img').files[0];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('profile-img').src = e.target.result;
+                localStorage.setItem('profileImage', e.target.result);
+            };
+            if (file) reader.readAsDataURL(file);
+        }
+    
+        // Load user data
+        function loadUserData() {
+            const storedUser = localStorage.getItem('loggedInUser');
+            const storedImage = localStorage.getItem('profileImage');
+    
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                document.getElementById('tutor-name').textContent = `${user.firstName} ${user.lastName}`;
+            } else {
+                const user = { firstName: 'John', lastName: 'Doe' };
+                localStorage.setItem('loggedInUser', JSON.stringify(user));
+                document.getElementById('tutor-name').textContent = `${user.firstName} ${user.lastName}`;
+            }
+    
+            if (storedImage) {
+                document.getElementById('profile-img').src = storedImage;
+            }
+        }
+    
+        // Initialize
         document.addEventListener("DOMContentLoaded", function () {
+            loadUserData();
             displayCourses();
         });
     </script>
-    
-    
     
 </body>
 

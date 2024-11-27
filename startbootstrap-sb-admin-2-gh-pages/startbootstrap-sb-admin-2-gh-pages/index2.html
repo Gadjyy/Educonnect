@@ -190,15 +190,13 @@
             <h5 class="mt-3" id="student-name">[Student Name]</h5>
         </div>
         <hr class="bg-light">
-        <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i>  Tutors Profile</a>
-        <hr>
         <a href="index2.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <hr>
-        <a href="courses.html" class="nav-link"><i class="fas fa-book"></i> Courses</a>
+        <a href="courses2.html" class="nav-link"><i class="fas fa-book"></i> Courses</a>
         <hr>
-        <a href="schedule.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Schedule</a>
-        <hr>
-        <a href="feedback.html" class="nav-link"><i class="fas fa-comments"></i> Feedback</a>
+        <!-- <a href="schedule.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Schedule</a>
+        <hr> -->
+        <!-- <a href="feedback.html" class="nav-link"><i class="fas fa-comments"></i> Feedback</a> -->
     </div>
 
     <!-- Main Content -->
@@ -243,26 +241,19 @@
             </a>
         </div>
 
-        <!-- Display Student's Schedule -->
-        <div id="student-schedule-section"></div>
-    </div>
-
     <script>
-        // Student Data
-        const studentData = {
-            name: "John Doe",
-            memberSince: "January 2022",
-            schedule: [
-                { date: "2024-11-24", course: "Math 101", time: "10:00 AM" },
-                { date: "2024-11-25", course: "Science 202", time: "12:00 PM" }
-            ],
-            proficiency: [70, 80, 90]  // Example data for subject proficiency chart (Math, Science, English)
-        };
-
-        // Setting student data dynamically
-        document.getElementById("student-name").textContent = studentData.name;
-        document.getElementById("greeting").textContent = `Hello, ${studentData.name}!`;
-        document.getElementById("member-since").textContent = studentData.memberSince;
+           // Check for logged-in user
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (!loggedInUser || loggedInUser.role !== 'student') {
+                alert('Unauthorized access. Please log in.');
+                window.location.href = 'login.html';
+            } else {
+                // Set user details in the dashboard
+                document.getElementById('student-name').textContent = `${loggedInUser.firstName} ${loggedInUser.lastName}`;
+                document.getElementById('greeting').textContent = `Hello, ${loggedInUser.firstName}!`;
+                const memberSince = loggedInUser.memberSince || new Date().toLocaleDateString();
+                document.getElementById("member-since").textContent = memberSince;
+            }
 
         // Display upcoming schedule
         const scheduleSection = document.getElementById("student-schedule-section");
@@ -274,6 +265,7 @@
                 </div>
             `;
         });
+
 
         // Logout Function
         function logout() {

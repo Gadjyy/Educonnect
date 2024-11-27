@@ -170,6 +170,10 @@
         .tutor-fields {
             display: none;
         }
+        .input-group .toggle-password {
+        border-radius: 0;
+        padding: 5px 10px;
+        }
     </style>
 </head>
 
@@ -206,7 +210,14 @@
                                 <input type="email" class="form-control" placeholder="Email Address" name="email" required>
                             </div>
                             <div class="form-group">
-                                <input type="password" class="form-control" placeholder="Password" name="password" id="password" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" placeholder="Password" name="password" id="password" required>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-secondary toggle-password" id="toggle-password">
+                                            Show
+                                        </button>
+                                    </div>
+                                </div>
                                 <div id="password-guidelines" class="password-guidelines">
                                     Password must contain at least 8 characters, including numbers and symbols.
                                 </div>
@@ -215,11 +226,19 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <input type="password" class="form-control" placeholder="Confirm Password" name="confirm_password" id="confirm-password" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" placeholder="Confirm Password" name="confirm_password" id="confirm-password" required>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-secondary toggle-password" id="toggle-confirm-password">
+                                            Show
+                                        </button>
+                                    </div>
+                                </div>
                                 <div id="password-mismatch" class="password-mismatch" style="display: none;">
                                     Passwords do not match.
                                 </div>
                             </div>
+                            
 
                             <div class="form-group">
                                 <select class="form-control" name="role" id="role" required>
@@ -316,6 +335,16 @@
         }, 3000);
 
     }, 5000); // Wait 5 seconds before showing the approval message
+});
+
+document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function () {
+        const passwordField = this.id === 'toggle-password' ? document.getElementById('password') : document.getElementById('confirm-password');
+        const isPasswordVisible = passwordField.type === 'text';
+
+        passwordField.type = isPasswordVisible ? 'password' : 'text';
+        this.textContent = isPasswordVisible ? 'Show' : 'Hide';
+    });
 });
 
     </script>
