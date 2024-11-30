@@ -137,17 +137,53 @@
             margin-bottom: 20px;
         }
 
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 0.5rem;
+        }
+
+        .form-group input[type="time"] {
+            padding-left: 1rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+        }
+
         #courses-list ul {
             list-style-type: none;
             padding: 0;
         }
 
         #courses-list ul li {
-            padding: 10px;
-            margin-bottom: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
             background: #e2e6ea;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 1.1rem;
         }
+
+        #courses-list ul li button {
+            float: right;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+
     </style>
 </head>
 
@@ -172,8 +208,6 @@
         </div>
         <hr>
         <a href="index.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <!-- <hr>
-        <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a> -->
         <hr>
         <a href="manage-bookings.html" class="nav-link"><i class="fas fa-calendar-check"></i> Manage Bookings</a>
         <hr>
@@ -182,94 +216,114 @@
         <a href="feedback.html" class="nav-link"><i class="fas fa-comments"></i> Feedback</a>
     </div>
 
-
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <h2>Manage Courses</h2>
 
         <!-- Add Course Form -->
-        <div class="course-card">
-            <h4>Add New Course</h4>
-            <input type="text" id="course-name" placeholder="Course Name">
-            <input type="text" id="course-code" placeholder="Course Code">
-            <div class="form-group">
-                <label for="student-limit">Student Limit</label>
-                <input type="number" id="student-limit" class="form-control" placeholder="Enter student limit" min="1" required>
-            </div>            
-            <label for="course-day">Select Day:</label>
-            <select id="course-day">
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
-            </select>
-            <label for="course-time">Select Time:</label>
-            <input type="time" id="course-time">
-            <label for="course-material">Upload Course Material (Optional):</label>
-            <input type="file" id="course-material" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-            <button class="btn btn-primary" onclick="addCourse()">Add Course</button>
-        </div>
+<div class="course-card">
+    <h4>Add New Course</h4>
+    <div class="form-group">
+        <input type="text" id="course-name" placeholder="Course Name" required class="form-control">
+    </div>
+    <div class="form-group">
+        <input type="text" id="course-code" placeholder="Course Code" required class="form-control">
+    </div>
+    <div class="form-group">
+        <input type="number" id="student-limit" placeholder="Enter student limit" min="1" required class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="course-day">Select Day:</label>
+        <select id="course-day" class="form-control">
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="course-time">Select Time:</label>
+        <input type="time" id="course-time" class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="course-material">Upload Course Material (Optional):</label>
+        <input type="file" id="course-material" class="form-control" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+    </div>
+    <div class="form-group">
+        <label for="class-meet-link">Class Meet Link:</label>
+        <input type="url" id="class-meet-link" placeholder="Enter Class Meet Link" class="form-control">
+    </div>
+    <button class="btn btn-primary" onclick="addCourse()">Add Course</button>
+</div>
 
-        <!-- Courses List -->
+
+        <!-- Course List -->
         <div id="courses-list">
-            <h4>Courses List</h4>
-            <ul id="course-items"></ul>
+            <h4>Your Courses</h4>
+            <ul id="course-items">
+                <!-- Dynamic list of courses will appear here -->
+            </ul>
         </div>
     </div>
 
     <script>
+        // Old Scripts for Course Management, LocalStorage, and Profile
         function addCourse() {
-            const courseName = document.getElementById('course-name').value;
-            const courseCode = document.getElementById('course-code').value;
-            const courseDay = document.getElementById('course-day').value;
-            const courseTime = document.getElementById('course-time').value;
-            const studentLimit = parseInt(document.getElementById('student-limit').value);
+    const courseName = document.getElementById('course-name').value;
+    const courseCode = document.getElementById('course-code').value;
+    const courseDay = document.getElementById('course-day').value;
+    const courseTime = document.getElementById('course-time').value;
+    const studentLimit = parseInt(document.getElementById('student-limit').value);
+    const classMeetLink = document.getElementById('class-meet-link').value; // Get the class meet link
     
-            if (courseName && courseCode && courseDay && courseTime && studentLimit > 0) {
-                const courses = JSON.parse(localStorage.getItem('courses')) || [];
-                const confirmedSchedules = JSON.parse(localStorage.getItem('confirmedSchedules')) || [];
-    
-                // Check if course already exists and whether student limit is reached
-                const existingCourse = courses.find(course => course.code === courseCode);
-                if (existingCourse && existingCourse.enrolledStudents >= existingCourse.studentLimit) {
-                    alert("The course has reached its student limit.");
-                    return;
-                }
-    
-                // Create new course object
-                const newCourse = { 
-                    name: courseName, 
-                    code: courseCode, 
-                    day: courseDay, 
-                    time: courseTime, 
-                    studentLimit: studentLimit,
-                    enrolledStudents: 0  // Initialize with zero enrolled students
-                };
-    
-                // Add course to both lists
-                courses.push(newCourse);
-                confirmedSchedules.push(newCourse);
-    
-                // Update localStorage
-                localStorage.setItem('courses', JSON.stringify(courses));
-                localStorage.setItem('confirmedSchedules', JSON.stringify(confirmedSchedules));
-    
-                // Clear inputs
-                document.getElementById('course-name').value = '';
-                document.getElementById('course-code').value = '';
-                document.getElementById('course-day').value = 'Monday';
-                document.getElementById('course-time').value = '';
-                document.getElementById('student-limit').value = '';
-    
-                // Refresh the course list
-                displayCourses();
-            } else {
-                alert("Please fill all fields and set a valid student limit.");
-            }
+    if (courseName && courseCode && courseDay && courseTime && studentLimit > 0 && classMeetLink) {
+        const courses = JSON.parse(localStorage.getItem('courses')) || [];
+        const confirmedSchedules = JSON.parse(localStorage.getItem('confirmedSchedules')) || [];
+
+        // Check if course already exists and whether student limit is reached
+        const existingCourse = courses.find(course => course.code === courseCode);
+        if (existingCourse && existingCourse.enrolledStudents >= existingCourse.studentLimit) {
+            alert("The course has reached its student limit.");
+            return;
         }
+
+        // Create new course object including class meet link
+        const newCourse = {
+            name: courseName,
+            code: courseCode,
+            day: courseDay,
+            time: courseTime,
+            studentLimit: studentLimit,
+            enrolledStudents: 0,  // Initialize with zero enrolled students
+            meetLink: classMeetLink // Save the class meet link
+        };
+
+        // Add course to both lists
+        courses.push(newCourse);
+        confirmedSchedules.push(newCourse);
+
+        // Update localStorage
+        localStorage.setItem('courses', JSON.stringify(courses));
+        localStorage.setItem('confirmedSchedules', JSON.stringify(confirmedSchedules));
+
+        // Clear inputs
+        document.getElementById('course-name').value = '';
+        document.getElementById('course-code').value = '';
+        document.getElementById('course-day').value = 'Monday';
+        document.getElementById('course-time').value = '';
+        document.getElementById('student-limit').value = '';
+        document.getElementById('class-meet-link').value = ''; // Clear class meet link input
+
+        // Refresh the course list
+        displayCourses();
+    } else {
+        alert("Please fill all fields and set a valid student limit.");
+    }
+}
+
     
         function deleteCourse(index) {
             const courses = JSON.parse(localStorage.getItem('courses')) || [];
@@ -291,28 +345,23 @@
         }
     
         function displayCourses() {
-            const courses = JSON.parse(localStorage.getItem('courses')) || [];
-            const courseItems = document.getElementById('course-items');
-            courseItems.innerHTML = '';
-    
-            courses.forEach((course, index) => {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `
-                    ${course.name} (Code: ${course.code}) - Every ${course.day} at ${course.time}
-                    - Limit: ${course.studentLimit} students (Enrolled: ${course.enrolledStudents})
-                    <button class="btn btn-danger btn-sm ms-2" onclick="deleteCourse(${index})">Delete</button>
-                `;
-                courseItems.appendChild(listItem);
-            });
-        }
-    
-        // // Sidebar toggle
-        // document.getElementById('toggleSidebar').addEventListener('click', function () {
-        //     const sidebar = document.getElementById('sidebar');
-        //     const mainContent = document.getElementById('mainContent');
-        //     sidebar.classList.toggle('collapsed');
-        //     mainContent.classList.toggle('collapsed');
-        // });
+    const courses = JSON.parse(localStorage.getItem('courses')) || [];
+    const courseItems = document.getElementById('course-items');
+    courseItems.innerHTML = '';
+
+    courses.forEach((course, index) => {
+        const listItem = document.createElement('li');
+        
+        listItem.innerHTML = `
+            ${course.name} (Code: ${course.code}) - Every ${course.day} at ${course.time}
+            - Limit: ${course.studentLimit} students (Enrolled: ${course.enrolledStudents}) Class Meet Link: ${course.meetLink}
+            <button class="btn btn-danger btn-sm ms-2" onclick="deleteCourse(${index})">Delete</button>
+        `;
+        
+        courseItems.appendChild(listItem);
+    });
+}
+
     
         // Profile image preview and upload
         function previewImage() {
@@ -350,7 +399,6 @@
             displayCourses();
         });
     </script>
-    
 </body>
 
 </html>

@@ -154,7 +154,8 @@
             text-decoration: underline;
         }
 
-        .save-schedule, .remove-schedule {
+        .save-schedule,
+        .remove-schedule {
             margin-top: 10px;
         }
     </style>
@@ -242,44 +243,59 @@
 
         // Display confirmed schedules from localStorage
         function displaySchedules() {
-            const schedules = JSON.parse(localStorage.getItem("courses")) || [];
-            const scheduleSection = document.getElementById("schedule-section");
-            scheduleSection.innerHTML = "";
+    const schedules = JSON.parse(localStorage.getItem("courses")) || [];
+    const scheduleSection = document.getElementById("schedule-section");
+    scheduleSection.innerHTML = "";
 
-            schedules.forEach(schedule => {
-                const card = `
-                    <div class="schedule-card" data-schedule-id="${schedule.code}">
-                        <h5>${schedule.name}</h5>
-                        <p><strong>Code:</strong> ${schedule.code}</p>
-                        <p><strong>Day:</strong> ${schedule.day}</p>
-                        <p><strong>Time:</strong> ${schedule.time}</p>
-                        <button class="btn btn-primary btn-sm save-schedule" data-schedule='${JSON.stringify(schedule)}'>
-                            Save to Dashboard
-                        </button>
-                        <button class="btn btn-danger btn-sm remove-schedule mt-2" data-schedule-id="${schedule.code}">
-                            Remove from Dashboard
-                        </button>
-                    </div>`;
-                scheduleSection.innerHTML += card;
-            });
+    schedules.forEach(schedule => {
+        const card = `
+            <div class="schedule-card" data-schedule-id="${schedule.code}">
+                <h5>${schedule.name}</h5>
+                <p><strong>Code:</strong> ${schedule.code}</p>
+                <p><strong>Day:</strong> ${schedule.day}</p>
+                <p><strong>Time:</strong> ${schedule.time}</p>
+                <p><strong>Student Limit:</strong> ${schedule.studentLimit}</p>
+                <p><strong>Course Material:</strong> <a href="${schedule.courseMaterial}" target="_blank">Download</a></p>
+                <p><strong>Class Link:</strong> <a href="${schedule.classLink}" target="_blank">Join Class</a></p> <!-- Display class link -->
+                <button class="save-schedule btn btn-primary" data-schedule='${JSON.stringify(schedule)}'>Save to Dashboard</button>
+                <button class="remove-schedule btn btn-danger" data-schedule-id="${schedule.code}">Remove from Dashboard</button>
+            </div>
+        `;
+        scheduleSection.innerHTML += card;
+    });
+}
 
-            // Add event listeners to "Save to Dashboard" and "Remove from Dashboard" buttons
-            const saveButtons = document.querySelectorAll('.save-schedule');
-            saveButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const scheduleData = JSON.parse(this.getAttribute('data-schedule'));
-                    saveScheduleToDashboard(scheduleData);
-                });
-            });
 
-            const removeButtons = document.querySelectorAll('.remove-schedule');
-            removeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const scheduleId = this.getAttribute('data-schedule-id');
-                    removeScheduleFromDashboard(scheduleId);
-                });
-            });
+        // Save schedule to dashboard
+        function saveScheduleToDashboard(scheduleData) {
+            const savedSchedules = JSON.parse(localStorage.getItem("savedSchedules")) || [];
+            savedSchedules.push(scheduleData);
+            localStorage.setItem("savedSchedules", JSON.stringify(savedSchedules));
+            displaySchedules();
         }
+
+        // Remove schedule from dashboard
+        function removeScheduleFromDashboard(scheduleId) {
+            let schedules = JSON.parse(localStorage.getItem("savedSchedules")) || [];
+            schedules = schedules.filter(schedule => schedule.code !== scheduleId);
+            localStorage.setItem("savedSchedules", JSON.stringify(schedules));
+            displaySchedules();
+        }
+
+        // Event delegation for save/remove buttons
+        document.getElementById("schedule-section").addEventListener('click', function (event) {
+            if (event.target.classList.contains('save-schedule')) {
+                const scheduleData = JSON.parse(event.target.getAttribute('data-schedule'));
+                saveScheduleToDashboard(scheduleData);
+            }
+            if (event.target.classList.contains('remove-schedule')) {
+                const scheduleId = event.target.getAttribute('data-schedule-id');
+                removeScheduleFromDashboard(scheduleId);
+            }
+        });
+
+        // Initial load
+        displaySchedules();
 
         // Save schedule to dashboard
         function saveScheduleToDashboard(scheduleData) {
@@ -291,6 +307,7 @@
             } else {
                 alert("This schedule is already saved on the Dashboard.");
             }
+            displaySchedules();
         }
 
         // Remove schedule from dashboard
