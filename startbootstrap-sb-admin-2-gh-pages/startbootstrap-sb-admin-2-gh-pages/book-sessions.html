@@ -243,6 +243,7 @@
                     availableSlots--;
                     updateSchedule();
                     alert(`Session booked with ${tutorName} on ${date} at ${time}`);
+                    window.location.href = 'index2.html'; // Redirect to dashboard
                 } else {
                     alert('No slots remaining');
                 }
@@ -313,6 +314,7 @@
 
     // Logout Functionality
     function logout() {
+        
         // Optionally clear other localStorage items if necessary
         // but leave the profile image intact
         window.location.href = 'login.html'; // Redirect to login page

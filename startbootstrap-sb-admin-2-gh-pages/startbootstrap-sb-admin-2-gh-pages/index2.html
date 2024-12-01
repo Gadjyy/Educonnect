@@ -84,20 +84,14 @@
             display: flex;
             align-items: center;
             padding: 10px;
-            /* Add padding for better hover effect */
             border-radius: 5px;
-            /* Rounded corners for each link */
             transition: background 0.3s, color 0.3s;
-            /* Smooth transition for color and background */
         }
 
         .sidebar .nav-link:hover {
             background-color: #e0f7fa;
-            /* Light blue background on hover */
             color: #006064;
-            /* Darker text color on hover */
             transform: scale(1.05);
-            /* Slight scaling effect */
         }
 
         .main-content {
@@ -210,7 +204,7 @@
         <div class="greeting-box">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h2 id="greeting">Hello, Teacher [Student Full Name]!</h2>
+                    <h2 id="greeting">Hello, Student [Student Full Name]!</h2>
                     <p>We’re glad to have you with us. Let’s make every session count!</p>
                     <p><strong>Member since:</strong> <span id="member-since">Loading...</span></p>
                 </div>
@@ -245,7 +239,9 @@
         <!-- Schedule Section -->
         <div class="schedule-section">
             <h3>Upcoming Schedule</h3>
-            <ul id="schedule-list" class="schedule-list"></ul>
+            <ul id="schedule-list" class="schedule-list">
+                <!-- Upcoming schedules will be dynamically populated here -->
+            </ul>
         </div>
     </div>
 
@@ -264,71 +260,83 @@
 
         // When the page loads, check if the user is logged in
         document.addEventListener("DOMContentLoaded", function () {
-            const storedUser = localStorage.getItem("loggedInUser");
+    const storedUser = localStorage.getItem("loggedInUser");
 
-            if (storedUser) {
-                const user = JSON.parse(storedUser);
-                document.getElementById("greeting").textContent = `Hello, Student ${user.firstName}!`;
-                document.getElementById("student-name").textContent = `${user.firstName} ${user.lastName}`;
-                const memberSince = user.memberSince || new Date().toLocaleDateString();
-                document.getElementById("member-since").textContent = memberSince;
+    if (storedUser) {
+        const user = JSON.parse(storedUser);
+        document.getElementById("greeting").textContent = `Hello, Student ${user.firstName}!`;
+        document.getElementById("student-name").textContent = `${user.firstName} ${user.lastName}`;
+        const memberSince = user.memberSince || new Date().toLocaleDateString();
+        document.getElementById("member-since").textContent = memberSince;
+
+        // Display Upcoming Schedule
+        const bookings = JSON.parse(localStorage.getItem('bookings')) || []; // Default to empty array if no bookings
+        const scheduleList = document.getElementById('schedule-list');
+        
+        // Clear the existing schedule list
+        scheduleList.innerHTML = '';
+        
+        if (bookings.length === 0) {
+            const li = document.createElement('li');
+            li.textContent = 'No upcoming sessions scheduled.';
+            scheduleList.appendChild(li);
+        } else {
+            bookings.forEach(booking => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="course">Tutor: ${booking.tutorName}</span>
+                    <span>Date: ${booking.date}</span>
+                    <span>Time: ${booking.time}</span>
+                `;
+                scheduleList.appendChild(li);
+            });
+        }
+    } else {
+        loginUser(); // Simulate login if no user is found
+        location.reload(); // Reload to pick up new data
+    }
+});
+
+        // Profile Picture Preview and Save
+        function previewImage() {
+            const file = document.getElementById('upload-img').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageBase64 = e.target.result; // Base64 string of the image
+                    document.getElementById('profile-img').src = imageBase64;
+
+                    // Save the image in localStorage
+                    localStorage.setItem('profileImage', imageBase64);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // On page load, set the profile image if available
+        document.addEventListener("DOMContentLoaded", function () {
+            const storedImage = localStorage.getItem('profileImage');
+            if (storedImage) {
+                document.getElementById('profile-img').src = storedImage;
             } else {
-                loginUser(); // Simulate login if not found
-                location.reload(); // Reload to pick up new data
+                document.getElementById('profile-img').src = 'https://via.placeholder.com/100';
             }
         });
 
-        // Profile Picture Preview and Save
-    function previewImage() {
-        const file = document.getElementById('upload-img').files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageBase64 = e.target.result; // Base64 string of the image
-                document.getElementById('profile-img').src = imageBase64;
+        function logout() {
+    // Remove bookings, user data, and profile image from localStorage
+    localStorage.removeItem('bookings');
+    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('profileImage');
+    
+    // Clear the schedule list from the UI
+    const scheduleList = document.getElementById('schedule-list');
+    scheduleList.innerHTML = ''; // Clear the schedule list
+    
+    // Redirect to the login page
+    window.location.href = 'login.html';
+}
 
-                // Save the image in localStorage
-                localStorage.setItem('profileImage', imageBase64);
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // On page load, set the profile image if available
-    document.addEventListener("DOMContentLoaded", function () {
-        const storedImage = localStorage.getItem('profileImage');
-        if (storedImage) {
-            document.getElementById('profile-img').src = storedImage;
-        } else {
-            document.getElementById('profile-img').src = 'https://via.placeholder.com/100';
-        }
-    });
-
-        // Mock Data for Schedule
-        const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-
-        // Display User Info
-        document.getElementById('student-name').textContent = `${loggedInUser.firstName} ${loggedInUser.lastName}`;
-        document.getElementById('greeting').textContent = `Hello, ${loggedInUser.firstName}!`;
-
-        // Display Schedule
-        const scheduleList = document.getElementById('schedule-list');
-        bookings.forEach(booking => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <span class="course">Tutor: ${booking.tutorName}</span>
-                <span>Date: ${booking.date}</span>
-                <span>Time: ${booking.time}</span>
-            `;
-            scheduleList.appendChild(li);
-        });
-
-        // Logout Functionality
-    function logout() {
-        // Optionally clear other localStorage items if necessary
-        // but leave the profile image intact
-        window.location.href = 'login.html'; // Redirect to login page
-    }
 
     </script>
 </body>
