@@ -435,6 +435,7 @@ function loadProficiencyChart() {
 function logout() {
     // Clear the profile data from localStorage
     localStorage.removeItem("profileData");
+    localStorage.removeItem("profileImage");
     localStorage.removeItem("acceptedBookings");  // Optionally clear accepted bookings
     localStorage.removeItem("declinedBookings");  // Optionally clear declined bookings
     // Redirect to login or home page

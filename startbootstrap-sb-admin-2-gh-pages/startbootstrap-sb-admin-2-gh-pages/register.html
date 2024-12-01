@@ -299,7 +299,7 @@
             mismatchMessage.style.display = password !== confirmPassword ? 'block' : 'none';
         });
 
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const firstName = document.querySelector('input[name="first_name"]').value;
@@ -319,25 +319,39 @@
 
     localStorage.setItem(email, JSON.stringify(user));
 
-    // Show "pending" notification
     const notification = document.getElementById('notification');
-    notification.textContent = 'Account is pending for approval!'; // Change text to 'pending for approval'
-    notification.style.backgroundColor = '#ff9800'; // Orange color for "pending"
-    notification.classList.add('show');
 
-    // After 5 seconds, show the "approved" message
-    setTimeout(function() {
-        notification.textContent = 'You have been approved!'; // Change text to 'approved'
-        notification.style.backgroundColor = '#4CAF50'; // Green color for "approved"
-        
-        // Redirect to the login page after 3 seconds
-        setTimeout(function() {
+    if (role === 'Tutor') {
+        // Show "pending" notification for tutors
+        notification.textContent = 'Account is pending for approval!';
+        notification.style.backgroundColor = '#ff9800'; // Orange for "pending"
+        notification.classList.add('show');
+
+        // After 5 seconds, show the "approved" message
+        setTimeout(function () {
+            notification.textContent = 'You have been approved!';
+            notification.style.backgroundColor = '#4CAF50'; // Green for "approved"
+            
+            // Redirect to the login page after 3 seconds
+            setTimeout(function () {
+                notification.classList.remove('show');
+                window.location.href = 'login.html'; // Redirect to login page
+            }, 3000);
+
+        }, 5000); // Wait 5 seconds before showing the approval message
+    } else {
+        // Directly redirect for students
+        notification.textContent = 'Account created successfully!';
+        notification.style.backgroundColor = '#4CAF50'; // Green for success
+        notification.classList.add('show');
+
+        setTimeout(function () {
             notification.classList.remove('show');
-            window.location.href = 'login.html'; // Redirect to login page
-        }, 3000);
-
-    }, 5000); // Wait 5 seconds before showing the approval message
+            window.location.href = 'login.html';
+        }, 2000); // Wait 2 seconds before redirecting for students
+    }
 });
+
 
 document.querySelectorAll('.toggle-password').forEach(button => {
     button.addEventListener('click', function () {

@@ -13,6 +13,85 @@
             font-family: 'Nunito', sans-serif;
             background-color: #f8f9fc;
             margin: 0;
+            scroll-behavior: smooth;
+            /* Smooth scroll for navigation */
+        }
+
+        .navbar {
+            background-color: #6EC1E4;
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar .btn-logout {
+            background-color: #4e73df;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .navbar .btn-logout:hover {
+            background-color: #2e59d9;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 250px;
+            background: #ffffff;
+            color: #333;
+            height: calc(100vh - 60px);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar .profile {
+            text-align: center;
+        }
+
+        .sidebar .profile img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            margin: 10px 0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+
+        .sidebar .nav-link:hover {
+            background: #f1f1f1;
+            /* Subtle light grey background */
+            color: #4e73df;
+            /* Change text color to blue */
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar .nav-link.active {
+            background: #f1f1f1;
+            color: #4e73df;
         }
 
         .main-content {
@@ -21,7 +100,8 @@
             margin-top: 60px;
         }
 
-        .book-session-section {
+        .book-session-section,
+        .view-schedule-section {
             background-color: #fff;
             padding: 30px;
             border-radius: 10px;
@@ -29,7 +109,8 @@
             margin-bottom: 30px;
         }
 
-        .book-session-section h2 {
+        .book-session-section h2,
+        .view-schedule-section h2 {
             font-size: 28px;
             color: #333;
             margin-bottom: 30px;
@@ -60,16 +141,65 @@
         }
 
         .session-form .btn:hover {
-            background-color: #53b0d3;
+            background-color: #4aa3c7;
         }
 
-        .session-form .mt-3 {
-            margin-top: 10px;
+        .schedule-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .schedule-list li {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .slots-remaining {
+            font-weight: bold;
+            color: #4e73df;
+        }
+
+        /* Styling for the session button */
+        .btn-logout {
+            border: 1px solid #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            background: transparent;
         }
     </style>
 </head>
 
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index2.html">
+            <h4>Student Dashboard</h4>
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a href="login.html" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="profile">
+            <img src="https://via.placeholder.com/100" alt="Profile Image" id="profile-img">
+            <h5 class="mt-3" id="student-name">[Student Name]</h5>
+        </div>
+        <hr>
+        <a href="index2.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <hr>
+        <a href="courses2.html" class="nav-link"><i class="fas fa-book"></i> Courses</a>
+        <hr>
+        <a href="book-sessions.html" class="nav-link"><i class="fas fa-calendar-check"></i> Book a Session</a>
+        <hr>
+        <a href="search-tutors.html" class="nav-link"><i class="fas fa-search"></i> Search Tutors</a>
+        <hr>
+        <a href="ratings.html" class="nav-link"><i class="fas fa-star"></i> Rate Tutors</a>
+        <hr>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
         <!-- Book a Session Section -->
@@ -88,21 +218,107 @@
                 <button type="button" class="btn btn-success mt-3" onclick="bookSession()">Book Now</button>
             </form>
         </div>
+
+        <!-- View Schedule Section -->
+        <div class="view-schedule-section">
+            <h2>View Schedule</h2>
+            <ul id="schedule-list" class="schedule-list"></ul>
+            <p class="slots-remaining">Slots Remaining: <span id="slots-remaining">5</span></p>
+            <a href="ratings.html" class="btn btn-primary mt-3">Rate Tutors</a>
+        </div>
     </div>
 
     <script>
+        let availableSlots = 5;
+
         function bookSession() {
             const tutorName = document.getElementById('tutor-name').value;
             const date = document.getElementById('session-date').value;
             const time = document.getElementById('session-time').value;
 
             if (tutorName && date && time) {
-                alert(`Session booked with ${tutorName} on ${date} at ${time}`);
-                // You can send this data to the server for confirmation
+                if (availableSlots > 0) {
+                    const booking = { tutorName, date, time };
+                    saveBooking(booking);
+                    availableSlots--;
+                    updateSchedule();
+                    alert(`Session booked with ${tutorName} on ${date} at ${time}`);
+                } else {
+                    alert('No slots remaining');
+                }
             } else {
                 alert('Please fill out all fields');
             }
         }
+
+        function saveBooking(booking) {
+            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            bookings.push(booking);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+        }
+
+        function updateSchedule() {
+            const scheduleList = document.getElementById('schedule-list');
+            const slotsRemaining = document.getElementById('slots-remaining');
+
+            scheduleList.innerHTML = '';
+            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            bookings.forEach(booking => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Tutor: ${booking.tutorName}, Date: ${booking.date}, Time: ${booking.time}`;
+                scheduleList.appendChild(listItem);
+            });
+
+            slotsRemaining.textContent = availableSlots;
+        }
+
+        // Retrieve student info on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedUser = localStorage.getItem('loggedInUser');
+            const storedImage = localStorage.getItem('profileImage');
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                document.getElementById('student-name').textContent = `${user.firstName} ${user.lastName}`;
+            }
+            if (storedImage) {
+                document.getElementById('profile-img').src = storedImage;
+            }
+        });
+
+       // Profile Picture Preview and Save
+    function previewImage() {
+        const file = document.getElementById('upload-img').files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageBase64 = e.target.result; // Base64 string of the image
+                document.getElementById('profile-img').src = imageBase64;
+
+                // Save the image in localStorage
+                localStorage.setItem('profileImage', imageBase64);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // On page load, set the profile image if available
+    document.addEventListener("DOMContentLoaded", function () {
+        const storedImage = localStorage.getItem('profileImage');
+        if (storedImage) {
+            document.getElementById('profile-img').src = storedImage;
+        } else {
+            document.getElementById('profile-img').src = 'https://via.placeholder.com/100';
+        }
+    });
+
+    // Logout Functionality
+    function logout() {
+        // Optionally clear other localStorage items if necessary
+        // but leave the profile image intact
+        window.location.href = 'login.html'; // Redirect to login page
+    }
+        // Initialize schedule on page load
+        updateSchedule();
     </script>
 </body>
 
